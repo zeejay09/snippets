@@ -1,0 +1,8 @@
+backup db = drush sql-dump >  /var/tmp/04262019_backup.sql
+restore db = drush sql-cli < /home/mcampbell1/Repositories/opss-site/databases/opss_stage_09262018.sql
+drop db = drush sql-drop
+cache rebuild = drush cr
+
+login = /user
+username = admin
+pass = T0psecret!@!

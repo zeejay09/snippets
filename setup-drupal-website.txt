@@ -1,0 +1,56 @@
+1. Install Drupal using DevDesktop and rename it to the name of the website with "- copy".
+2. Create a folder with the name of the website but without the "- copy".
+3. Go inside the newly created folder and execute git clone (If using source tree, navigate to the create folder and click clone on the repository) and after cloning, open command line in the same folder and execute composer install.
+4. Navigate to FileZilla and create a new site with the name of the folder.
+5. In the general tab, enter hostname: *will be provided*
+6. Change logon type to: Key file
+7. Enter user: *will be provided*
+8. Keyfile: navigate to the folder where you kept the .pem file. * file will be provided*
+9. Go to advanced tab, set the default local directory to the newly created folder and default remote to /var/www/html/ (See examples below)
+10. Go to the backup folder of your website (with "- copy").
+11. Navigate to sites and copy the folder with ".dd" to the same location of your website's root folder.
+12. Go back to the backup folder and now navagite to sites/default folder.
+13. Copy the settings.php to the same location of your website's root folder.
+14. Open the settings.php from your website's root folder to any text editor and uncomment lines 777 - 779 and click save (See below the lines of code to be uncommented).
+15. Inside the root folder of your website, open the command line and execute the database commands below.
+16. After executing the commands below, go back to FileZilla and navigate to "/var/www/html/sites/default".
+17. Drag the "files" folder from the remote (right) to the same location to your local website folder (left).
+18. After all operations are done, open acquia devdesktop and go to the website.
+
+
+Database Command:
+mysql -u root -p
+show databases;
+use *name of website*;
+source *file location*;
+
+hprc website
+general tab
+hostname: ec2-50-17-47-204.compute-1.amazonaws.com
+user: ec2-user
+Keyfile: C:\Users\zeeja\OneDrive - g.msuiit.edu.ph\Documents\pem\tiag-east-drupal-dev.pem
+advanced tab
+Default local directory: C:\Users\zeeja\Sites\devdesktop\hprc
+Default remote directory: /var/www/html
+
+opss website
+general tab
+hostname: ec2-52-54-237-161.compute-1.amazonaws.com
+user: ec2-user
+Keyfile: C:\Users\zeeja\OneDrive - g.msuiit.edu.ph\Documents\pem\tiag-east-drupal-dev.pem
+advanced tab
+Default local directory: C:\Users\zeeja\Sites\devdesktop\opss
+Default remote directory: /var/www/html
+
+Uncomment this in settings.php
+if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
+  include $app_root . '/' . $site_path . '/settings.local.php';
+}
+
+enable modules
+devel
+develkit
+webprofiler
+
+drush commands
+drush sql-drop
