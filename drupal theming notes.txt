@@ -1,0 +1,13 @@
+Regions - are important for drupal themers.
+	- they provide the layout for the website.
+	- they provide layout for where the blocks can be placed in the website.
+
+Things to note:
+1. Must have a wire-frame, a detailed wire-frame is a plus.
+2. In the wire-frame, identify the blocks to plan where the regions where will be put.
+3. When planning for regions, always keep in mind responsiveness of the website.
+
+3 Steps to create a theme:
+1. Define the region/s in your themes.info.yml.
+2. Print the variable corresponding to the region defined in your page template file. 
+3. Add blocks to the region using the drupal gui.
