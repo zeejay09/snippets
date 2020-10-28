@@ -1,0 +1,125 @@
+1. Clone repo https://github.com/stackacademytv/master-electron
+2. Install electron via npm: npm i -D electron@latest
+3. You can install any modules you like from npm or yarn.
+- Electron is just a nodejs api for desktop development using web frameworks.
+- Electron is compatible with any javascript frontend frameworks.
+4. BrowserWindow - Create and control browser windows.
+Example:
+// In the main process.
+const { BrowserWindow } = require('electron')
+
+// Or use `remote` from the renderer process.
+// const { BrowserWindow } = require('electron').remote
+
+const win = new BrowserWindow({ width: 800, height: 600 })
+
+// Load a remote URL
+win.loadURL('https://github.com')
+
+// Or load a local HTML file
+win.loadURL(`file://${__dirname}/app/index.html`)
+
+Link to BrowserWindow API Docs for more details: https://www.electronjs.org/docs/api/browser-window
+
+6. IPC in Electron.
+6.1 ipcMain - Communicate asynchronously from the main process to renderer processes.
+            - is an Event Emitter. When used in the main process, it handles asynchronous and synchronous messages sent from a renderer process (web page). Messages sent from a renderer will be emitted to this module.
+
+Sending Messages
+It is also possible to send messages from the main process to the renderer process, see webContents.send for more information.
+ - When sending a message, the event name is the channel.
+ - To reply to a synchronous message, you need to set event.returnValue.
+ - To send an asynchronous message back to the sender, you can use event.reply(...). This helper method will automatically handle messages coming from frames that aren't the main frame (e.g. iframes) whereas event.sender.send(...) will always send to the main frame.
+An example of sending and handling messages between the render and main processes:
+// In main process.
+const { ipcMain } = require('electron')
+ipcMain.on('asynchronous-message', (event, arg) => {
+  console.log(arg) // prints "ping"
+  event.reply('asynchronous-reply', 'pong')
+})
+
+ipcMain.on('synchronous-message', (event, arg) => {
+  console.log(arg) // prints "ping"
+  event.returnValue = 'pong'
+})
+
+// In renderer process (web page).
+const { ipcRenderer } = require('electron')
+console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
+
+ipcRenderer.on('asynchronous-reply', (event, arg) => {
+  console.log(arg) // prints "pong"
+})
+ipcRenderer.send('asynchronous-message', 'ping')
+
+Link ipcMain methods for further details: https://www.electronjs.org/docs/api/ipc-main
+
+7. ipcRenderer - Communicate asynchronously from a renderer process to the main process.
+               - is an EventEmitter. It provides a few methods so you can send synchronous and asynchronous messages from the render process (web page) to the main process. You can also receive replies from the main process.
+See above for ipcRenderer code example.
+Link ipcRenderer methods for further details: https://www.electronjs.org/docs/api/ipc-renderer
+
+For Application Distribution:
+Install electron-builder as development dependency via npm: npm i -D electron-builder
+Basic building commands:
+ - build for macOS, Windows and Linux
+    - electron-builder -mwl
+ - build deb and tar.xz for Linux
+    - electron-builder --linux deb tar.xz
+ - build NSIS 32-bit installer for Windows
+    - electron-builder --windows nsis:ia32
+ - set package.json property foo to bar
+    - electron-builder -c.extraMetadata.foo=bar
+ - configure unicode options for NSIS
+    - electron-builder -c.nsis.unicode=false
+
+You can also set building options in package.json. Example:
+"build": {
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64",
+          "ia32"
+        ]
+      }
+    ]
+  }
+}
+
+For further details about the building configuration head to the docs: https://www.electron.build/configuration/configuration
+For details about code signing go to: https://www.electron.build/code-signing
+
+For publishing a project:
+The publish key contains a set of options instructing electron-builder on how it should publish artifacts and build update info files for auto update.
+You can publish to Bintray, Generic Server, GitHub, S3, Spaces or Snap Store.
+Travis and AppVeyor support publishing artifacts. But it requires additional configuration for each CI and you need to configure what to publish. electron-builder makes publishing dead simple.
+
+If GH_TOKEN is defined — defaults to [{provider: "github"}].
+
+If BT_TOKEN is defined and GH_TOKEN is not — defaults to [{provider: "bintray"}].
+
+You can publish to multiple providers. For example, to publish Windows artifacts to both GitHub and Bintray (order is important — first item will be used as a default auto-update server, so, in this example app will use github as auto-update provider):
+{
+  "build": {
+    "win": {
+      "publish": ["github", "bintray"]
+    }
+  }
+}
+
+The basic command to publish is: electron-builder build --win -publish never
+For more command configuration/options, head to the publish docs: https://www.electron.build/configuration/publish
+
+Setting up auto updater:
+Install via npm: npm i electron-updater
+Electron auto updater full example: https://github.com/iffy/electron-updater-example
+Electron manual updater via the menu bar: https://github.com/electron-userland/electron-builder/blob/docs/encapsulated%20manual%20update%20via%20menu.js
+
+Auto Updater basic methods:
+ - setFeedURL
+ - checkForUpdates
+ - quiatAndInstall
+For more methods and thorough explanation, visit: https://www.electronjs.org/docs/api/auto-updater
+Full guide on auto updater: https://www.electronjs.org/docs/tutorial/updates
